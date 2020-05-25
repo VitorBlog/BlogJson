@@ -1,5 +1,6 @@
 package com.vitorblog.json
 
+import com.vitorblog.json.model.JsonFormatter
 import com.vitorblog.json.model.JsonValue
 import com.vitorblog.json.model.exception.JsonValueNotFoundException
 import com.vitorblog.json.util.TypeUtils
@@ -71,26 +72,18 @@ class Json {
     }
 
     /* Input/Output functions */
-
     override
-    fun toString():String {
-        var string = "{"
+    fun toString() = toString(true)
 
-        for ((key, jsonValue) in fields) {
-            val value = when (TypeUtils.identifyType(jsonValue)) {
-                TypeUtils.JsonType.INT, TypeUtils.JsonType.BOOLEAN -> "${jsonValue.value}"
-                TypeUtils.JsonType.JSON -> "${jsonValue.asJson()}"
-                TypeUtils.JsonType.ARRAY -> "${jsonValue.asJsonArray()}"
-                else -> "\"${jsonValue.value}\""
-            }
+    fun toFormattedString() = toString(true)
 
-            string += "\"$key\":$value,"
+    fun toString(beautify:Boolean = false):String {
+        return if (beautify) {
+            JsonFormatter.format(this)
+        } else {
+            JsonFormatter.format(this, -1)
         }
-
-        return "${string.substring(0, string.length-1)}}"
     }
-
-    fun toFile(file: File) = file.writeText(toString())
 
     companion object {
 
