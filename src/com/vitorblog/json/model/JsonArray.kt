@@ -17,7 +17,7 @@ class JsonArray : ArrayList<Any> {
         return if (beautify) {
             JsonFormatter.format(this)
         } else {
-            JsonFormatter.format(this, -1)
+            JsonFormatter.format(this, -999)
         }
     }
 

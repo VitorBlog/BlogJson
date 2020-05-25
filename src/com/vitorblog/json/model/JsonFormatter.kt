@@ -19,7 +19,11 @@ object JsonFormatter {
 
         }
 
-        return "${string.substring(0, string.length-2)}$newLine${tabs.substring(4)}}"
+        return if (tabSize <= -1) {
+            "${string.substring(0, string.length-1)}$tabs}"
+        } else {
+            "${string.substring(0, string.length-2)}$newLine${tabs.substring(4)}}"
+        }
     }
 
     fun format(jsonArray: JsonArray, tabSize:Int = 0):String {
@@ -37,7 +41,11 @@ object JsonFormatter {
 
         }
 
-        return "${string.substring(0, string.length-2)}$newLine${tabs.substring(4)}]"
+        return if (tabSize <= -1) {
+            "${string.substring(0, string.length-1)}$tabs]"
+        } else {
+            "${string.substring(0, string.length-2)}$newLine${tabs.substring(4)}]"
+        }
     }
 
 }
