@@ -14,7 +14,7 @@ class Json {
     operator
     fun get(key:String, smartGet:Boolean = true): JsonValue {
 
-        return (if (key.contains(".")) {
+        return (if (key.contains(".") && smartGet) {
             smartGet(key)
         } else {
             fields[key]
@@ -80,6 +80,7 @@ class Json {
             val value = when (TypeUtils.identifyType(jsonValue)) {
                 TypeUtils.JsonType.INT, TypeUtils.JsonType.BOOLEAN -> "${jsonValue.value}"
                 TypeUtils.JsonType.JSON -> "${jsonValue.asJson()}"
+                TypeUtils.JsonType.ARRAY -> "${jsonValue.asJsonArray()}"
                 else -> "\"${jsonValue.value}\""
             }
 
