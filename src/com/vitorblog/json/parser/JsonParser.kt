@@ -1,4 +1,4 @@
-package com.vitorblog.json.model
+package com.vitorblog.json.parser
 
 import com.vitorblog.json.Json
 import com.vitorblog.json.model.exception.InvalidJsonException
@@ -41,9 +41,23 @@ class JsonParser(text:String) {
                         Status.READING_VALUE -> {
                             status = Status.NOTHING
 
-                            json.set(key, value)
-                            key = ""
-                            value = ""
+                            setValue()
+                        }
+
+                    }
+
+                }
+
+                Token.INT -> {
+
+                    when (status) {
+
+                        Status.WAITING_VALUE -> {
+                            status = Status.READING_VALUE
+                        }
+
+                        Status.READING_VALUE -> {
+                            value += char
                         }
 
                     }
@@ -72,35 +86,13 @@ class JsonParser(text:String) {
 
     }
 
+    fun setValue(any:Any = value) {
+        json.set(key, any)
+
+        key = ""
+        value = ""
+    }
+
     fun toJson(): Json? = json
-
-    enum class Status {
-
-        NOTHING,
-        READING_KEY,
-        READING_VALUE,
-        WAITING_VALUE,
-
-    }
-
-    enum class Token(var value:String) {
-
-        CURLY_OPEN("{"),
-        CURLY_CLOSE("{"),
-        TEXT_QUOTES("\""),
-        SQUARE_OPEN("["),
-        SQUARE_CLOSE("]"),
-        BOOLEAN_TRUE("true"),
-        BOOLEAN_FALSE("false"),
-        OPEN_VALUE(":"),
-        NULL("null");
-
-        companion object {
-            fun byValue(value:String): Token? {
-                return values().firstOrNull { it.value == value }
-            }
-        }
-
-    }
 
 }
