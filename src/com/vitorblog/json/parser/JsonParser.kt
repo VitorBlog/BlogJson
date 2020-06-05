@@ -239,7 +239,7 @@ class JsonParser(text: String, debug: Boolean = false) {
                         Status.READING_BOOLEAN -> {
                             status = Status.NOTHING
 
-                            setValue(value.subSequence(0, value.length - 1) == "true")
+                            setValue(value == "true")
                         }
 
                     }
@@ -261,8 +261,6 @@ class JsonParser(text: String, debug: Boolean = false) {
     }
 
     fun setValue(any: Any = value) {
-        println("[SETVALUE | STATUS = ${status.name} | VALUE = $value] $any")
-
         json.set(key, any)
 
         key = ""
