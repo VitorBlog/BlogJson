@@ -1,9 +1,9 @@
 package com.vitorblog.json
 
 import com.vitorblog.json.model.JsonFormatter
+import com.vitorblog.json.parser.JsonParser
 import com.vitorblog.json.model.JsonValue
 import com.vitorblog.json.model.exception.JsonValueNotFoundException
-import com.vitorblog.json.util.TypeUtils
 import java.io.File
 
 class Json {
@@ -66,14 +66,14 @@ class Json {
 
     }
 
-    fun set(key:String, value:Any): Json {
+    fun set(key:String, value: Any?): Json {
         fields[key] = JsonValue(value)
         return this
     }
 
     /* Input/Output functions */
     override
-    fun toString() = toString(true)
+    fun toString() = toString(false)
 
     fun toFormattedString() = toString(true)
 
@@ -89,8 +89,8 @@ class Json {
 
         fun parse(file:File) = parse(file.readText())
 
-        fun parse(string: String): Json? {
-            return null
+        fun parse(string: String, debug: Boolean = false): Json? {
+            return JsonParser(string, debug).toJson()
         }
 
     }

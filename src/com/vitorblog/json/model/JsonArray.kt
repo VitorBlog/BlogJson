@@ -1,11 +1,11 @@
 package com.vitorblog.json.model
 
-import com.vitorblog.json.util.TypeUtils
+import com.vitorblog.json.Json
+import com.vitorblog.json.parser.JsonArrayParser
+import com.vitorblog.json.parser.JsonParser
 import java.io.File
 
-class JsonArray : ArrayList<Any> {
-
-    constructor(collection:Collection<*>? = null) : super(collection ?: listOf())
+class JsonArray(collection: Collection<*>? = null) : ArrayList<Any>(collection ?: listOf()) {
 
     /* Input/Output functions */
     override
@@ -19,6 +19,16 @@ class JsonArray : ArrayList<Any> {
         } else {
             JsonFormatter.format(this, -999)
         }
+    }
+
+    companion object {
+
+        fun parse(file: File) = parse(file.readText())
+
+        fun parse(string: String, debug: Boolean = false): JsonArray? {
+            return JsonArrayParser(string, debug).toArray()
+        }
+
     }
 
 }

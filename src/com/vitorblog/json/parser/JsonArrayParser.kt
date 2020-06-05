@@ -1,20 +1,16 @@
 package com.vitorblog.json.parser
 
-import com.vitorblog.json.Json
-import com.vitorblog.json.model.exception.InvalidJsonException
+import com.vitorblog.json.model.JsonArray
 
-class JsonParser(text: String, debug: Boolean = false) {
+class JsonArrayParser(text: String, debug: Boolean = false) {
 
-    var json: Json = Json()
-    var status = Status.NOTHING
+    var jsonArray = JsonArray()
+    var status = Status.WAITING_VALUE
 
-    var key: String = ""
     var value: String = ""
 
     init {
-        if (!text.startsWith("{") || !text.endsWith("}")) {
-            throw InvalidJsonException("curly brackets are invalid")
-        }
+        println(text)
 
         val characters = text.toCharArray()
         for (char in characters) {
@@ -25,27 +21,16 @@ class JsonParser(text: String, debug: Boolean = false) {
 
                     when (status) {
 
-                        /* Json */
-                        Status.READING_JSON, Status.READING_ARRAY -> {
+                        Status.READING_JSON -> {
                             value += char
                         }
 
-                        /* Key */
-                        Status.NOTHING -> {
-                            status = Status.READING_KEY
-                        }
-
-                        Status.READING_KEY -> {
-                            status = Status.WAITING_VALUE
-                        }
-
-                        /* String */
                         Status.WAITING_VALUE -> {
                             status = Status.READING_STRING
                         }
 
                         Status.READING_STRING -> {
-                            status = Status.NOTHING
+                            status = Status.WAITING_VALUE
 
                             setValue()
                         }
@@ -61,7 +46,7 @@ class JsonParser(text: String, debug: Boolean = false) {
                         Status.READING_BOOLEAN -> {
                             status = Status.READING_KEY
 
-                            setValue(value.subSequence(0, value.length - 1) == "true")
+                            setValue(value == "true")
                         }
 
                     }
@@ -73,7 +58,7 @@ class JsonParser(text: String, debug: Boolean = false) {
                     when (status) {
 
                         /* Json */
-                        Status.READING_JSON, Status.READING_ARRAY -> {
+                        Status.READING_JSON -> {
                             value += char
                         }
 
@@ -95,7 +80,7 @@ class JsonParser(text: String, debug: Boolean = false) {
                     when (status) {
 
                         /* Json */
-                        Status.READING_JSON, Status.READING_ARRAY -> {
+                        Status.READING_JSON -> {
                             value += char
                         }
 
@@ -121,7 +106,7 @@ class JsonParser(text: String, debug: Boolean = false) {
                             value += char
                         }
 
-                        Status.READING_JSON, Status.READING_ARRAY -> {
+                        Status.READING_JSON -> {
                             value += char
                         }
 
@@ -134,17 +119,13 @@ class JsonParser(text: String, debug: Boolean = false) {
                     when (status) {
 
                         Status.READING_JSON -> {
-                            status = Status.NOTHING
+                            status = Status.WAITING_VALUE
                             value += char
                             setValue(JsonParser(value, false).toJson()!!)
                         }
 
-                        Status.READING_ARRAY -> {
-                            value += char
-                        }
-
                         Status.READING_STRING -> {
-                            status = Status.NOTHING
+                            status = Status.WAITING_VALUE
 
                             setValue()
                         }
@@ -160,7 +141,7 @@ class JsonParser(text: String, debug: Boolean = false) {
                         Status.READING_BOOLEAN -> {
                             status = Status.READING_KEY
 
-                            setValue(value.subSequence(0, value.length - 1) == "true")
+                            setValue(value == "true")
                         }
 
                     }
@@ -188,30 +169,24 @@ class JsonParser(text: String, debug: Boolean = false) {
 
                     when (status) {
 
-                        Status.READING_ARRAY -> {
-                            status = Status.NOTHING
-                            value += char
-                            setValue(JsonArrayParser(value.substring(1), false).toArray()!!)
-                        }
-
                         Status.READING_STRING -> {
-                            status = Status.NOTHING
+                            status = Status.WAITING_VALUE
 
                             setValue()
                         }
 
                         /* Int */
                         Status.READING_INT -> {
-                            status = Status.READING_KEY
+                            status = Status.WAITING_VALUE
 
                             setValue(value.toInt())
                         }
 
                         /* Boolean */
                         Status.READING_BOOLEAN -> {
-                            status = Status.READING_KEY
+                            status = Status.WAITING_VALUE
 
-                            setValue(value.subSequence(0, value.length - 1) == "true")
+                            setValue(value == "true")
                         }
 
                     }
@@ -222,24 +197,20 @@ class JsonParser(text: String, debug: Boolean = false) {
 
                     when (status) {
 
-                        Status.READING_KEY -> {
-                            key += char
-                        }
-
                         Status.READING_STRING, Status.READING_JSON, Status.READING_ARRAY -> {
                             value += char
                         }
 
                         Status.READING_INT -> {
-                            status = Status.NOTHING
+                            status = Status.WAITING_VALUE
 
                             setValue(value.toInt())
                         }
 
                         Status.READING_BOOLEAN -> {
-                            status = Status.NOTHING
+                            status = Status.WAITING_VALUE
 
-                            setValue(value.subSequence(0, value.length - 1) == "true")
+                            setValue(value == "true")
                         }
 
                     }
@@ -253,22 +224,18 @@ class JsonParser(text: String, debug: Boolean = false) {
                     "[STATUS = ${status.name} | TOKEN = ${Token.byValue(
                         char.toString(),
                         status
-                    )?.name} | CHAR = $char] \"$key\": $value"
+                    )?.name} | CHAR = $char] $value"
                 )
 
         }
-
     }
 
     fun setValue(any: Any = value) {
-        println("[SETVALUE | STATUS = ${status.name} | VALUE = $value] $any")
+        jsonArray.add(any)
 
-        json.set(key, any)
-
-        key = ""
         value = ""
     }
 
-    fun toJson(): Json? = json
+    fun toArray(): JsonArray? = jsonArray
 
 }
