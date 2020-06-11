@@ -30,7 +30,7 @@ object JsonFormatter {
         }
 
         return if (tabSize <= -1) {
-            "{${string.substring(0, string.length - 1)}$tabs}"
+            "{${string}$tabs}"
         } else {
             "{${string.substring(0, string.length - 1)}$newLine${tabs.substring(4)}}"
         }
