@@ -10,7 +10,6 @@ class JsonArrayParser(text: String, debug: Boolean = false) {
     var value: String = ""
 
     init {
-        println(text)
 
         val characters = text.toCharArray()
         for (char in characters) {
